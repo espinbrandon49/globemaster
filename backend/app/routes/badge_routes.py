@@ -23,7 +23,16 @@ def get_player_badges(player_id):
 @badge_bp.route("/grant", methods=["POST"])
 def grant_badge():
     data = request.get_json()
-    badge = PlayerBadge(player_id=data["player_id"], badge_id=data["badge_id"])
-    db.session.add(badge)
+    player_id = data["player_id"]
+    badge_id = data["badge_id"]
+
+    existing = PlayerBadge.query.get((player_id, badge_id))
+    if existing:
+        return jsonify({"message": "Badge already granted"}), 200
+
+    new_entry = PlayerBadge(player_id=player_id, badge_id=badge_id)
+    db.session.add(new_entry)
     db.session.commit()
-    return jsonify({"message": "Badge granted!"})
+
+    return jsonify({"message": "Badge granted!"}), 201
+

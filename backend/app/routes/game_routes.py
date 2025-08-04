@@ -3,9 +3,7 @@ from app.models import GameSession, GameSessionQuestion, Player, Question, Profi
 import random
 from app.utils import grant_badge_once
 
-
 game_bp = Blueprint("game_bp", __name__)
-
 
 # GET /games/ — All Game Sessions
 @game_bp.route("/", methods=["GET"])
@@ -24,7 +22,6 @@ def get_all_game_sessions():
         ]
     )
 
-
 # GET /games/<id> — One Game Session
 @game_bp.route("/<int:session_id>", methods=["GET"])
 def get_game_session(session_id):
@@ -41,7 +38,6 @@ def get_game_session(session_id):
             "questions_answered": s.questions_answered,
         }
     )
-
 
 # POST /games/ — Start New Session with Dynamic Question Selection
 @game_bp.route("/", methods=["POST"])
@@ -117,56 +113,51 @@ def create_game_session():
         201,
     )
 
-
 # PUT /games/<id> — Update Score or Questions Answered
 @game_bp.route("/<int:session_id>", methods=["PUT"])
 def update_game_session(session_id):
-    session = GameSession.query.get(session_id)
-    if not session:
-        return jsonify({"error": "Session not found"}), 404
-
+    session = GameSession.query.get_or_404(session_id)
     data = request.get_json()
-    session.score = data.get("score", session.score)
-    session.questions_answered = data.get(
-        "questions_answered", session.questions_answered
-    )
 
+    # Update values from frontend
+    session.score = data.get("score", session.score)
+    session.questions_answered = data.get("questions_answered", session.questions_answered)
     db.session.commit()
 
-    # Perfect Score → 🎯
+    # ✅ DEBUG: Print current session state
+    print(f"🧪 [Badge Check] Session {session.id} — Score: {session.score}, Questions Answered: {session.questions_answered}")
+
+    # 🔥 BADGE: Perfect Score
     if session.score == 10:
         grant_badge_once(session.player_id, "Perfect Score")
+        print(f"✅ Checked for Perfect Score badge on session {session.id}")
 
-    # 🏷️ Category-Specific Perfect Score Badges
-    session_questions = (
-        GameSessionQuestion.query.filter_by(session_id=session_id)
+    # 🔥 BADGE: Category-specific
+    results = (
+        db.session.query(GameSessionQuestion.is_correct, Question.category)
         .join(Question, GameSessionQuestion.question_id == Question.id)
-        .with_entities(GameSessionQuestion.is_correct, Question.category)
+        .filter(GameSessionQuestion.session_id == session.id)
         .all()
     )
 
-    if len(session_questions) == 10 and all(q[0] for q in session_questions):
-        categories = {q[1] for q in session_questions}
-        if len(categories) == 1:
-            category = categories.pop()
+    category_counts = {}
+    for is_correct, category in results:
+        if is_correct:
+            category_counts[category] = category_counts.get(category, 0) + 1
 
-            category_badges = {
-                "Capitals": "Perfect Capitals",
-                "Famous Landmarks": "Perfect Landmarks",
-                "Country Flags": "Perfect Flags",
-                "Oceans and Seas": "Perfect Oceans & Seas",
-                "Cultural Foods": "Perfect Cultural Foods",
-                "Animal Habitats": "Perfect Animal Habitats",
-                "Languages of the World": "Perfect Languages of the World",
-                "Natural Wonders": "Perfect Natural Wonders",
-            }
-            
-            badge_name = category_badges.get(category)
-            if badge_name:
-                grant_badge_once(session.player_id, badge_name)
+    for category, correct_count in category_counts.items():
+        if correct_count == 10:
+            badge_name = f"Perfect {category}"
+            grant_badge_once(session.player_id, badge_name)
+            print(f"🏅 Category badge check: {badge_name} for player {session.player_id}")
 
-    return jsonify({"message": "Session updated"})
-
+    return jsonify({
+    "id": session.id,
+    "player_id": session.player_id,
+    "start_time": session.start_time,
+    "score": session.score,
+    "questions_answered": session.questions_answered,
+})
 
 # DELETE /games/<id> — Remove GameSession
 @game_bp.route("/<int:session_id>", methods=["DELETE"])

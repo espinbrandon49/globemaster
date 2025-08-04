@@ -19,3 +19,6 @@ def grant_badge_once(player_id, badge_name):
     db.session.add(PlayerBadge(player_id=player_id, badge_id=badge.id))
     db.session.commit()
     print(f"🏅 Badge '{badge_name}' granted to player {player_id}")
+
+from app.models import PlayerBadge
+

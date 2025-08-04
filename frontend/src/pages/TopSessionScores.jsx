@@ -24,7 +24,7 @@ export default function TopSessionScores() {
     localStorage.removeItem("sessionId");
     localStorage.removeItem("questions");
     localStorage.removeItem("currentIndex");
-    navigate("/");  // Back to StartPage
+    navigate("/");
   };
 
   if (loading) return <div className="p-4 text-center" >Loading leaderboard...</div>

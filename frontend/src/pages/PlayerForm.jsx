@@ -13,16 +13,6 @@ function PlayerForm() {
   const [avatar, setAvatar] = useState(generateCodename())
   const navigate = useNavigate()
 
-  // Skip if already in localStorage
-  // useEffect(() => {
-  //   const playerId = localStorage.getItem("playerId")
-  //   const playerName = localStorage.getItem("playerName")
-
-  //   if (playerId && playerName) {
-  //     navigate("/init")
-  //   }
-  // }, [navigate])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
@@ -43,7 +33,7 @@ function PlayerForm() {
         if (err.status === 404) {
           player = await createPlayer({ name: trimmedName, email });
         } else {
-          throw err; // surface other errors (e.g. network, 500, etc)
+          throw err;
         }
       }
 

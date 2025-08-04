@@ -23,7 +23,6 @@ export default function GameInit() {
 
       // ✅ Resume if session + questions already exist
       if (existingSession && storedQuestions) {
-        console.log("🧠 Resuming previous mission...");
         navigate("/play");
         return;
       }
@@ -38,9 +37,7 @@ export default function GameInit() {
           ...(isDifficultyMode ? { use_difficulty: true } : { category: rawCategory })
         };
 
-        // Log it to confirm the shape
         const session = await startGameSession(payload);
-        console.log("🎯 Session object from server:", session);
 
         const questions = session.questions
         if (!questions || questions.length === 0) {
@@ -54,7 +51,6 @@ export default function GameInit() {
         navigate("/play")
 
       } catch (err) {
-        console.error("🚨 Init error:", err);
         setError(err.message || "Failed to start session.");
       }
     };

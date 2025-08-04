@@ -87,7 +87,7 @@ function GamePlay() {
         is_correct: isCorrectNow,
       });
 
-      setTimeout(() => {
+      setTimeout(async () => {
         const nextIndex = currentIndex + 1;
 
         if (nextIndex >= 10 || nextIndex >= questions.length) {
@@ -95,14 +95,9 @@ function GamePlay() {
           localStorage.removeItem("questions");
           localStorage.removeItem("sessionId");
 
-          console.log(`✅ Final Score: ${correctCountRef.current} / ${questions.length}`);
+          // ✅ Send score to backend BEFORE navigating
+          await updateGameSession(sessionId, correctCountRef.current, questions.length);
 
-          // updateGameSession(sessionId, correctCountRef.current, questions.length)
-          //   .then(() => navigate("/summary", { state: { sessionId } }))
-          //   .catch(() => {
-          //     setError("Failed to finalize game session.");
-          //     setIsSubmitting(false);
-          //   });
           navigate("/summary", { state: { sessionId } });
         } else {
           setCurrentIndex(nextIndex);

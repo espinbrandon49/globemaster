@@ -35,7 +35,7 @@ function Summary() {
     localStorage.removeItem("sessionId");
     localStorage.removeItem("questions");
     localStorage.removeItem("currentIndex");
-    navigate("/");  // Back to StartPage
+    navigate("/"); 
   };
 
 
