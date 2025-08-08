@@ -92,9 +92,36 @@ GlobeMaster emphasizes backend-first logic:
 
 ---
 
-## 📸 Screenshots (optional)
+<details>
+<summary><strong>📸 Click to View Screenshots</strong></summary>
+<br>
 
-> *(Add later: Home screen, question view, badge modal, etc.)*
+<h3>🎯 Question Screen</h3>
+<img src="docs/question_screen.png" alt="Question Screen" width="700"/>
+<p><em>Live gameplay screen showing the question prompt, selected category and difficulty, and an input field for the player’s answer.</em></p>
+
+<h3>📊 End-of-Mission Summary</h3>
+<img src="docs/end_of_mission_summary.png" alt="End of Mission Summary" width="700"/>
+<p><em>End-of-mission debrief displaying questions answered, correct responses, and calculated accuracy.</em></p>
+
+<h3>🏆 Top Session Scores Leaderboard</h3>
+<img src="docs/top_session_scores.png" alt="Top Session Scores" width="700"/>
+<p><em>Leaderboard view ranking players by session performance, highlighting competitive scoring and replay value.</em></p>
+
+<h3>🪪 Commander Profile Creation</h3>
+<img src="docs/playerform.png" alt="Player Form" width="700"/>
+<p><em>Create-player screen where users input their call sign, choose a training intensity (difficulty), and assign a random avatar codename.</em></p>
+
+<h3>📐 Entity Relationship Diagram (ERD)</h3>
+<a href="docs/globemaster_erd.pdf">📄 View ERD PDF</a>
+<p><em>Visual map of all core database entities and their relationships, designed in draw.io and used for backend schema planning.</em></p>
+
+</details>
+
+## 🎥 Demo Video
+
+[![Watch the Demo](https://img.youtube.com/vi/WIwkGwSnizs/0.jpg)](https://youtu.be/WIwkGwSnizs)  
+*A complete walkthrough of GlobeMaster gameplay: from profile setup to leaderboard in just 1:34.*
 
 ---
 
