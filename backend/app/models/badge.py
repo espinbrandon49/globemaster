@@ -6,3 +6,5 @@ class Badge(db.Model):
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(256))
     icon = db.Column(db.String(128))  # Optional: path or emoji
+    category = db.Column(db.String(100))
+    threshold = db.Column(db.Integer, default=10)

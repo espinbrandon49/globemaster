@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import GameSession, GameSessionQuestion, Player, Question, Profile, db
+from app.models import GameSession, GameSessionQuestion, Player, Question, Profile, Badge, db
 import random
 from app.utils import grant_badge_once
 
@@ -145,11 +145,11 @@ def update_game_session(session_id):
         if is_correct:
             category_counts[category] = category_counts.get(category, 0) + 1
 
-    for category, correct_count in category_counts.items():
-        if correct_count == 10:
-            badge_name = f"Perfect {category}"
-            grant_badge_once(session.player_id, badge_name)
-            print(f"🏅 Category badge check: {badge_name} for player {session.player_id}")
+    badges = Badge.query.filter(Badge.category != None).all()
+    for badge in badges:
+        count = category_counts.get(badge.category, 0)
+        if count >= badge.threshold:
+            grant_badge_once(session.player_id, badge.name)
 
     return jsonify({
     "id": session.id,
