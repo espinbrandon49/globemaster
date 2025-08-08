@@ -53,7 +53,7 @@ def add_question_to_session():
     session.questions_answered += 1
     db.session.commit()
 
-    return jsonify({"message": "Answer recorded", "correct": is_correct}), 201
+    return jsonify({"message": "Answer recorded"}), 201
 
 
 # DELETE /game_questions/ — Remove a Question from a Session

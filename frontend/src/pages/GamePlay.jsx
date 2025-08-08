@@ -71,21 +71,26 @@ function GamePlay() {
     setHasSubmitted(true);
     setIsSubmitting(true);
     setError("");
-
-    const isCorrectNow =
-      userAnswer.trim().toLowerCase() === currentQuestion.correct_answer.toLowerCase();
-
-    setIsCorrect(isCorrectNow);
-    if (isCorrectNow) correctCountRef.current += 1;
-    setShowFeedback(true);
+    setShowFeedback(false);
 
     try {
+      const sessionBefore = await getGameSessionById(sessionId);
+      const scoreBefore = sessionBefore.score;
+
       await submitAnswer({
         session_id: sessionId,
         question_id: currentQuestion.id,
         player_answer: userAnswer,
-        is_correct: isCorrectNow,
       });
+
+      const sessionAfter = await getGameSessionById(sessionId);
+      const scoreAfter = sessionAfter.score;
+
+      const wasCorrect = scoreAfter > scoreBefore;
+      setIsCorrect(wasCorrect);
+      setShowFeedback(true);
+
+      if (wasCorrect) correctCountRef.current += 1;
 
       setTimeout(async () => {
         const nextIndex = currentIndex + 1;
@@ -95,7 +100,6 @@ function GamePlay() {
           localStorage.removeItem("questions");
           localStorage.removeItem("sessionId");
 
-          // ✅ Send score to backend BEFORE navigating
           await updateGameSession(sessionId, correctCountRef.current, questions.length);
 
           navigate("/summary", { state: { sessionId } });
@@ -115,6 +119,7 @@ function GamePlay() {
       setIsSubmitting(false);
     }
   };
+
 
   const difficultyColors = {
     Easy: {
@@ -189,9 +194,8 @@ function GamePlay() {
               {isCorrect ? "✅ Bullseye!" : "❌ Off Target"}
             </p>
             {!isCorrect && (
-              <p className="text-gray-700">
-                <span className="font-semibold text-blue-700">🧠 Knowledge Drop:</span>{" "}
-                {currentQuestion.correct_answer}
+              <p className="text-gray-700 italic">
+                Mission logged. You'll crush the next one.
               </p>
             )}
           </div>

@@ -104,7 +104,6 @@ def create_game_session():
                         "text": q.text,
                         "category": q.category,
                         "difficulty": q.difficulty,
-                        "correct_answer": q.correct_answer,
                     }
                     for q in selected
                 ],
