@@ -101,7 +101,7 @@ function GamePlay() {
           localStorage.removeItem("questions");
           localStorage.removeItem("sessionId");
 
-          await updateGameSession(sessionId, correctCountRef.current, questions.length);
+          await updateGameSession(sessionId);
 
           navigate("/summary", { state: { sessionId } });
         } else {

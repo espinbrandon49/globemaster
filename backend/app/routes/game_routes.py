@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import func, case
 from app.models import GameSession, GameSessionQuestion, Player, Question, Profile, Badge, db
 import random
 from app.utils import grant_badge_once
@@ -116,14 +117,21 @@ def create_game_session():
 @game_bp.route("/<int:session_id>", methods=["PUT"])
 def update_game_session(session_id):
     session = GameSession.query.get_or_404(session_id)
-    data = request.get_json()
 
-    # Update values from frontend
-    session.score = data.get("score", session.score)
-    session.questions_answered = data.get("questions_answered", session.questions_answered)
+    # 🔒 Recompute from authoritative answers; ignore any client-provided numbers
+    totals = (
+        db.session.query(
+            func.sum(case((GameSessionQuestion.is_correct == True, 1), else_=0)).label("score"),
+            func.count(GameSessionQuestion.question_id).label("answered"),
+        )
+        .filter(GameSessionQuestion.session_id == session.id)
+        .one()
+    )
+    session.score = int(totals.score or 0)
+    session.questions_answered = int(totals.answered or 0)
     db.session.commit()
 
-    # ✅ DEBUG: Print current session state
+    # ✅ DEBUG: Print current session state (keep your existing lines below this)
     print(f"🧪 [Badge Check] Session {session.id} — Score: {session.score}, Questions Answered: {session.questions_answered}")
 
     # 🔥 BADGE: Perfect Score
@@ -131,14 +139,13 @@ def update_game_session(session_id):
         grant_badge_once(session.player_id, "Perfect Score")
         print(f"✅ Checked for Perfect Score badge on session {session.id}")
 
-    # 🔥 BADGE: Category-specific
+    # 🔥 BADGE: Category-specific (unchanged)
     results = (
         db.session.query(GameSessionQuestion.is_correct, Question.category)
         .join(Question, GameSessionQuestion.question_id == Question.id)
         .filter(GameSessionQuestion.session_id == session.id)
         .all()
     )
-
     category_counts = {}
     for is_correct, category in results:
         if is_correct:
@@ -151,20 +158,9 @@ def update_game_session(session_id):
             grant_badge_once(session.player_id, badge.name)
 
     return jsonify({
-    "id": session.id,
-    "player_id": session.player_id,
-    "start_time": session.start_time,
-    "score": session.score,
-    "questions_answered": session.questions_answered,
-})
-
-# DELETE /games/<id> — Remove GameSession
-@game_bp.route("/<int:session_id>", methods=["DELETE"])
-def delete_game_session(session_id):
-    session = GameSession.query.get(session_id)
-    if not session:
-        return jsonify({"error": "Session not found"}), 404
-
-    db.session.delete(session)
-    db.session.commit()
-    return jsonify({"message": "session deleted"})
+        "id": session.id,
+        "player_id": session.player_id,
+        "start_time": session.start_time,
+        "score": session.score,
+        "questions_answered": session.questions_answered,
+    })

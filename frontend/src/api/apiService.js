@@ -54,8 +54,7 @@ export const getPlayerBadges = (id) => request(`badges/player/${id}`);
 
 export const grantBadge = (data) => request("badges/grant", "POST", data);
 
-export const updateGameSession = (sessionId, score, questions_answered) =>
-    request(`games/${sessionId}`, "PUT", { score, questions_answered });
+export const updateGameSession = (sessionId) => request(`games/${sessionId}`, "PUT");
 
 export const getTopSessionScores = () => request("leaderboard/top-session-scores");
 
