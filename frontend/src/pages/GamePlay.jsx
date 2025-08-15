@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { submitAnswer, updateGameSession, getProfileByPlayerId, getGameSessionById } from "../api/apiService";
+import useCategories from "../hooks/useCategories"; // ✅ new hook for key→label lookup
 import Button from "../components/Button";
 
 function GamePlay() {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { getLabel } = useCategories(); // ✅ use category labels
 
   const [questions] = useState(() => {
     const localQs = localStorage.getItem("questions");
@@ -27,16 +28,16 @@ function GamePlay() {
 
   const correctCountRef = useRef(0);
 
-  const playerId = localStorage.getItem("playerId")
-  const [profile, setProfile] = useState(null)
+  const playerId = localStorage.getItem("playerId");
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     if (playerId) {
       getProfileByPlayerId(playerId)
         .then(setProfile)
-        .catch(() => console.warn("⚠️ Could not load profile"))
+        .catch(() => console.warn("⚠️ Could not load profile"));
     }
-  }, [playerId])
+  }, [playerId]);
 
   useEffect(() => {
     if (!sessionId || questions.length === 0) {
@@ -120,7 +121,6 @@ function GamePlay() {
     }
   };
 
-
   const difficultyColors = {
     Easy: {
       bg: "bg-green-700",
@@ -128,7 +128,7 @@ function GamePlay() {
       text: "text-green-100",
       accent: "text-green-300",
     },
-    Medium: {
+    Intermediate: {
       bg: "bg-blue-800",
       border: "border-blue-300",
       text: "text-blue-100",
@@ -158,7 +158,7 @@ function GamePlay() {
         </h2>
         <div className="text-sm text-gray-600 mb-4 space-y-1">
           <p>
-            🗂️ <span className="font-medium">Category:</span> {currentQuestion.category}
+            🗂️ <span className="font-medium">Category:</span> {getLabel(currentQuestion.category)}
           </p>
           <p>
             🔥 <span className="font-medium">Difficulty:</span> {currentQuestion.difficulty}
@@ -221,7 +221,6 @@ function GamePlay() {
           <p className={`font-bold ${style.accent}`}>{profile.preferred_difficulty}</p>
         </div>
       )}
-
     </>
   );
 }

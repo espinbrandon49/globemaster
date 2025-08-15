@@ -5,11 +5,11 @@ import { startGameSession } from "../api/apiService";
 export default function GameInit() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const hasInitialized = useRef(false);
 
-  const hasInitialized = useRef(false)
   useEffect(() => {
-    if (hasInitialized.current) return
-    hasInitialized.current = true
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
 
     const init = async () => {
       const playerId = localStorage.getItem("playerId");
@@ -29,17 +29,18 @@ export default function GameInit() {
 
       try {
         const rawCategory = localStorage.getItem("playerCategory") || "preferred-difficulty";
-        const difficulty = localStorage.getItem("playerDifficulty") || "Easy";
         const isDifficultyMode = rawCategory === "preferred-difficulty";
 
         const payload = {
-          player_id: parseInt(playerId),
-          ...(isDifficultyMode ? { use_difficulty: true } : { category: rawCategory })
+          player_id: parseInt(playerId, 10),
+          ...(isDifficultyMode
+            ? { use_difficulty: true }
+            : { category: rawCategory }) // rawCategory is already a key like "natural_wonders"
         };
 
         const session = await startGameSession(payload);
 
-        const questions = session.questions
+        const questions = session.questions;
         if (!questions || questions.length === 0) {
           throw new Error("No questions received from server.");
         }
@@ -48,8 +49,7 @@ export default function GameInit() {
         localStorage.setItem("questions", JSON.stringify(questions));
         localStorage.setItem("currentIndex", "0");
 
-        navigate("/play")
-
+        navigate("/play");
       } catch (err) {
         setError(err.message || "Failed to start session.");
       }

@@ -30,6 +30,7 @@ def create_app():
     from app.routes.game_session_question_routes import game_session_question_bp
     from app.routes.badge_routes import badge_bp
     from app.routes.leaderboard_routes import leaderboard_bp
+    from app.routes.meta_routes import meta_bp
 
     app.register_blueprint(player_bp, url_prefix="/players")
     app.register_blueprint(profile_bp, url_prefix="/profiles")
@@ -38,5 +39,6 @@ def create_app():
     app.register_blueprint(game_session_question_bp, url_prefix="/game_questions")
     app.register_blueprint(badge_bp, url_prefix="/badges")
     app.register_blueprint(leaderboard_bp, url_prefix="/leaderboard")
+    app.register_blueprint(meta_bp, url_prefix="/meta")
 
     return app

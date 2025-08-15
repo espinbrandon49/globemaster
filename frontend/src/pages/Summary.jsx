@@ -2,42 +2,43 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getGameSessionById } from "../api/apiService";
 import BadgeDisplay from "../components/BadgeDisplay";
-
+import useCategories from "../hooks/useCategories"; // ✅ added for category labels
 import Button from "../components/Button";
 
 function Summary() {
-  const { state } = useLocation()
-  const navigate = useNavigate()
-  const sessionId = state?.sessionId || localStorage.getItem("sessionId")
-  const [summary, setSummary] = useState(null)
-  const [error, setError] = useState("")
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const sessionId = state?.sessionId || localStorage.getItem("sessionId");
+  const [summary, setSummary] = useState(null);
+  const [error, setError] = useState("");
+
+  const { getLabel } = useCategories(); // ✅ use category label lookup
 
   useEffect(() => {
     if (!sessionId) {
-      setError("Session ID not found.")
-      setTimeout(() => navigate("/"), 1500)
-      return
+      setError("Session ID not found.");
+      setTimeout(() => navigate("/"), 1500);
+      return;
     }
 
     const fetchSummary = async () => {
       try {
-        const data = await getGameSessionById(sessionId)
-        setSummary(data)
+        const data = await getGameSessionById(sessionId);
+        setSummary(data);
       } catch (err) {
-        setError("Failed to load game summary")
+        setError("Failed to load game summary");
       }
-    }
+    };
 
-    fetchSummary()
-  }, [sessionId, navigate])
+    fetchSummary();
+  }, [sessionId, navigate]);
 
   const handleRestart = () => {
     localStorage.removeItem("sessionId");
     localStorage.removeItem("questions");
     localStorage.removeItem("currentIndex");
-    navigate("/"); 
+    navigate("/");
   };
-
 
   if (error) {
     return (
@@ -86,14 +87,16 @@ function Summary() {
         </div>
       </div>
 
-      <BadgeDisplay playerId={player_id}/>
+      <BadgeDisplay playerId={player_id} />
       <p className="text-yellow-500 italic text-sm tracking-wide">
         Intelligence archived. Awaiting next assignment.
       </p>
       <Button onClick={handleRestart} className="mt-6 animate-fade-in">
         Play Again
       </Button>
-      <Button onClick={() => navigate("/leaderboard")} className="mt-3">🏆 View Top Scores</Button>
+      <Button onClick={() => navigate("/leaderboard")} className="mt-3">
+        🏆 View Top Scores
+      </Button>
     </div>
   );
 }

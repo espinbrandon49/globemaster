@@ -1,30 +1,45 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPlayer, createOrUpdateProfile, getPlayerByEmail } from "../api/apiService";
+import { createPlayer, createOrUpdateProfile, getPlayerByEmail, getCategories } from "../api/apiService";
 import { generateCodename } from "../utils/generateCodenameRoulette";
 
 import Button from "../components/Button";
 
 function PlayerForm() {
-  const [name, setName] = useState(localStorage.getItem("playerName") || "")
-  const [difficulty, setDifficulty] = useState("Easy")
-  const [category, setCategory] = useState("preferred-difficulty")
-  const [error, setError] = useState(null)
-  const [avatar, setAvatar] = useState(generateCodename())
-  const navigate = useNavigate()
+  const [name, setName] = useState(localStorage.getItem("playerName") || "");
+  const [difficulty, setDifficulty] = useState("Easy");
+  const [category, setCategory] = useState("preferred-difficulty");
+  const [error, setError] = useState(null);
+  const [avatar, setAvatar] = useState(generateCodename());
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
+
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCats = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data || []);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+        setCategories([]);
+      }
+    };
+    fetchCats();
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
-    const trimmedName = name.trim()
+    const trimmedName = name.trim();
     if (!trimmedName) {
       setError("🚫 Commander identity missing.");
-      return
+      return;
     }
 
     try {
-      const email = `${trimmedName.toLowerCase().replace(/\s+/g, "")}@example.com`
+      const email = `${trimmedName.toLowerCase().replace(/\s+/g, "")}@example.com`;
 
       let player;
       try {
@@ -37,22 +52,22 @@ function PlayerForm() {
         }
       }
 
-      localStorage.setItem("playerId", player.id)
-      localStorage.setItem("playerName", trimmedName)
-      localStorage.setItem("playerDifficulty", difficulty)
-      localStorage.setItem("playerCategory", category)
+      localStorage.setItem("playerId", player.id);
+      localStorage.setItem("playerName", trimmedName);
+      localStorage.setItem("playerDifficulty", difficulty);
+      localStorage.setItem("playerCategory", category);
 
       await createOrUpdateProfile({
         player_id: player.id,
         avatar,
         preferred_difficulty: difficulty,
-      })
+      });
 
-      navigate("/init")
+      navigate("/init");
     } catch (err) {
       setError(err.message || "⚠️ System failure. Try again.");
     }
-  }
+  };
 
   return (
     <div className="player-form max-w-md mx-auto mt-20 bg-white shadow-md rounded-lg p-8 text-center space-y-6 border border-blue-100">
@@ -60,9 +75,7 @@ function PlayerForm() {
         🪪 Mission Prep: Identify Yourself
       </h2>
 
-      {error && (
-        <p className="text-red-600 text-sm font-semibold">{error}</p>
-      )}
+      {error && <p className="text-red-600 text-sm font-semibold">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block text-left">
@@ -88,7 +101,8 @@ function PlayerForm() {
             <option value="Hard">Hard</option>
           </select>
         </label>
-        <label className="lock text-left">
+
+        <label className="block text-left">
           <span className="text-sm font-medium text-gray-700">Mission Type</span>
           <select
             value={category}
@@ -96,14 +110,11 @@ function PlayerForm() {
             className="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="preferred-difficulty">🎲 Surprise Me (By Difficulty)</option>
-            <option value="Capitals">Capitals</option>
-            <option value="Famous Landmarks">Famous Landmarks</option>
-            <option value="Country Flags">Country Flags</option>
-            <option value="Oceans and Seas">Oceans and Seas</option>
-            <option value="Cultural Foods">Cultural Foods</option>
-            <option value="Animal Habitats">Animal Habitats</option>
-            <option value="Languages of the World">Languages of the World</option>
-            <option value="Natural Wonders">Natural Wonders</option>
+            {categories.map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.label}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -128,4 +139,4 @@ function PlayerForm() {
   );
 }
 
-export default PlayerForm
+export default PlayerForm;

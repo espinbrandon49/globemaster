@@ -61,3 +61,5 @@ export const getTopSessionScores = () => request("leaderboard/top-session-scores
 
 export const getProfileByPlayerId = (playerId) =>
     request(`profiles/${playerId}`);
+
+export const getCategories = () => request("meta/categories");
