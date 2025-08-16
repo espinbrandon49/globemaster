@@ -488,7 +488,7 @@ with app.app_context():
             text="Where would you find the Taj Mahal?",
             correct_answer="India",
             category=CategoryKey.FAMOUS_LANDMARKS.value,
-            difficulty="Easy",
+            difficulty="Hard",
         ),
         Question(
             text="What country is home to the ancient city of Petra?",

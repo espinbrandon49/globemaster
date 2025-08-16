@@ -91,9 +91,13 @@ def create_game_session():
 
     db.session.commit()
 
-    # 🔁 Persistent Player — "Complete 5 total game sessions"
+    # 🔁 Persistent Player — read threshold from DB (seeded in Badge.threshold)
     session_total = GameSession.query.filter_by(player_id=player_id).count()
-    if session_total == 5:
+    persistent = Badge.query.filter_by(name="Persistent Player").first()
+    # Fallback keeps legacy behavior if badge mis-seeded or absent
+    threshold = (persistent.threshold if persistent and persistent.threshold is not None else 3)
+    # Use >= to be robust if sessions were created out-of-band
+    if session_total >= threshold:
         grant_badge_once(player_id, "Persistent Player")
 
     return (
