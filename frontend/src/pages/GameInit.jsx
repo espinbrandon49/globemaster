@@ -29,13 +29,10 @@ export default function GameInit() {
 
       try {
         const rawCategory = localStorage.getItem("playerCategory") || "preferred-difficulty";
-        const isDifficultyMode = rawCategory === "preferred-difficulty";
-
         const payload = {
           player_id: parseInt(playerId, 10),
-          ...(isDifficultyMode
-            ? { use_difficulty: true }
-            : { category: rawCategory }) // rawCategory is already a key like "natural_wonders"
+          use_difficulty: true, // always honor profile difficulty
+          ...(rawCategory !== "preferred-difficulty" ? { category: rawCategory } : {})
         };
 
         const session = await startGameSession(payload);

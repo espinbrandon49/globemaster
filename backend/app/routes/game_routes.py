@@ -67,7 +67,8 @@ def create_game_session():
 
     if category:
         questions_query = questions_query.filter_by(category=category)
-    elif use_difficulty:
+        
+    if use_difficulty:
         profile = Profile.query.filter_by(player_id=player_id).first()
         if not profile:
             return jsonify({"error": "Profile not found for player"}), 404

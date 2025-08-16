@@ -14,7 +14,7 @@ def get_questions():
 
     if category:
         query = query.filter_by(category=category)
-    elif difficulty:
+    if difficulty:
         query = query.filter_by(difficulty=difficulty)
 
     questions = query.order_by(db.func.random()).limit(10).all()
