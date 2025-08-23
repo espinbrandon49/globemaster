@@ -7,4 +7,4 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 EXPOSE 5000
-CMD ["python", "run.py"]
+CMD ["sh", "-c", "python seed.py && python seed_badges.py && python run.py"]
