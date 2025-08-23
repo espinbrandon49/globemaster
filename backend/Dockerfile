@@ -7,4 +7,6 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 EXPOSE 5000
-CMD ["sh", "-c", "python seed.py && python seed_badges.py && python run.py"]
+
+# Add a startup script that waits for DB, seeds, then runs app
+CMD ["sh", "-c", "until nc -z db 5432; do echo '⏳ Waiting for Postgres...'; sleep 1; done && echo '✅ DB is ready' && python seed.py && python seed_badges.py && python run.py"]
