@@ -13,11 +13,7 @@ def create_app():
     app.config.from_object(Config)
 
     # ✅ Apply CORS before routes — allow Vite dev server (5173)
-    CORS(
-        app,
-        resources={r"/*": {"origins": "http://localhost:5173"}},
-        supports_credentials=True,
-    )
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     db.init_app(app)
     migrate.init_app(app, db)

@@ -10,6 +10,6 @@ class Badge(db.Model):
     icon = db.Column(db.String(128))  # Optional: path or emoji
     category = db.Column(
         SAEnum(CategoryKey, native_enum=False, values_callable=lambda x: [e.value for e in x]),
-        nullable=False,
+        nullable=True,
     )
     threshold = db.Column(db.Integer, default=10)

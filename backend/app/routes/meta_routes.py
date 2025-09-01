@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from app.categories import all_categories
+from app import db
 
 meta_bp = Blueprint("meta_bp", __name__)
 
@@ -14,3 +15,4 @@ def health():
 @meta_bp.route("/ping", methods=["GET"])
 def ping():
     return "pong", 200
+
