@@ -74,6 +74,19 @@ docker-compose up --build
 
 ---
 
+## 🌍 Cloud Deployment
+
+GlobeMaster is fully deployed on **AWS ECS Fargate** with a managed **RDS PostgreSQL** database and an **Application Load Balancer**:
+
+- **Frontend**: React/Vite container, served via ECS/ALB  
+- **Backend**: Flask API container, exposed via ALB  
+- **Database**: PostgreSQL (Amazon RDS) for persistent sessions and badge data  
+- **Architecture**: Two ECS services behind a shared ALB with target groups for port 80 (frontend) and port 5000 (backend)
+
+**Demo mode:** The app is live on AWS for testing via the ALB DNS link:  http://alb-backend-1442970373.us-east-2.elb.amazonaws.com/
+
+> ⚠️ This ALB DNS is for demo purposes only (HTTP, no HTTPS). Hosting will be discontinued once AWS credits expire.
+
 ## 🧪 Sample Endpoints
 
 - `GET /games/<id>` – Retrieve game session info
