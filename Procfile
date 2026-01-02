@@ -1,2 +1,2 @@
-web: gunicorn backend.run:app
-release: flask --app backend.run db upgrade
+web: gunicorn --chdir backend run:app
+release: cd backend && flask --app run db upgrade
