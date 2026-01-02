@@ -45,10 +45,8 @@ def create_app():
     # SPA fallback: let React Router handle routes on refresh
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
-    
-    
     def serve_react(path):
-        # If it's an API route, don't serve index.html
+        # Only block API routes (prefix + "/..."), not the SPA page itself.
         api_prefixes = (
             "players",
             "profiles",
@@ -59,7 +57,8 @@ def create_app():
             "leaderboard",
             "meta",
         )
-        if path.startswith(api_prefixes):
+
+        if any(path == p or path.startswith(p + "/") for p in api_prefixes):
             return {"error": "Not found"}, 404
 
         return send_from_directory(app.static_folder, "index.html")
