@@ -8,7 +8,7 @@ migrate = Migrate()
 
 
 def create_app():
-    app = Flask(__name__, static_folder="static", static_url_path="")
+    app = Flask(__name__, static_folder="static")
     app.config.from_object(Config)
 
     db.init_app(app)
@@ -36,11 +36,32 @@ def create_app():
     from flask import send_from_directory
     import os
 
+    # Serve Vite-built assets at /assets/...
+    @app.route("/assets/<path:filename>")
+    def serve_assets(filename):
+        assets_dir = os.path.join(app.static_folder, "assets")
+        return send_from_directory(assets_dir, filename)
+
+    # SPA fallback: let React Router handle routes on refresh
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
+    
+    
     def serve_react(path):
-        if path != "" and (app.static_folder / path):
-            return send_from_directory(app.static_folder, path)
+        # If it's an API route, don't serve index.html
+        api_prefixes = (
+            "players",
+            "profiles",
+            "questions",
+            "games",
+            "game_questions",
+            "badges",
+            "leaderboard",
+            "meta",
+        )
+        if path.startswith(api_prefixes):
+            return {"error": "Not found"}, 404
+
         return send_from_directory(app.static_folder, "index.html")
 
     return app
