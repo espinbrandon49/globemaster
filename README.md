@@ -9,13 +9,13 @@ This project was built as a **portfolio-grade, end-to-end Python application**, 
 
 ## 🎯 Core Features
 
-- 🎮 Play full quiz sessions end-to-end
-- 🧭 Category-based and difficulty-based questions
-- 🧠 Backend-validated answers and scoring
-- 🏅 Badge system (first launch, milestones, achievements)
-- 📊 Persistent game sessions and player history
-- 🔁 Resume-safe gameplay (server-side state)
-- 🧑‍💻 Clean API consumed by a React frontend
+- 🎮 Play full quiz sessions end-to-end  
+- 🧭 Category-based and difficulty-based questions  
+- 🧠 Backend-validated answers and scoring  
+- 🏅 Badge system (first launch, milestones, achievements)  
+- 📊 Persistent game sessions and player history  
+- 🔁 Resume-safe gameplay (server-side state)  
+- 🧑‍💻 Clean API consumed by a React frontend  
 
 ---
 
@@ -26,9 +26,15 @@ This project was built as a **portfolio-grade, end-to-end Python application**, 
 | Frontend | React + Vite |
 | Backend | Python · Flask · SQLAlchemy |
 | Database | PostgreSQL |
-| Hosting | **Heroku (monolithic deployment)** |
+| Hosting | Heroku (monolithic deployment) |
 
-> The frontend build is served by the Flask backend in production.
+> In production, the built React frontend is served directly by the Flask backend.
+
+---
+
+## 🎥 Demo Video
+
+🎥 **Demo Video:** A short walkthrough of GlobeMaster’s gameplay flow, persistence, and leaderboards — https://youtu.be/jYXLE6toqDo
 
 ---
 
@@ -36,17 +42,17 @@ This project was built as a **portfolio-grade, end-to-end Python application**, 
 
 GlobeMaster is intentionally deployed as a **monolith**:
 
-- One Flask application
-- One PostgreSQL database
-- One deployed service
+- One Flask application  
+- One PostgreSQL database  
+- One deployed service  
 
-This matches the scale and scope of the project and avoids unnecessary infrastructure complexity while remaining production-ready.
+This approach matches the scope of the project and avoids unnecessary infrastructure complexity while remaining production-ready.
 
-**Key design principles:**
-- Backend is the source of truth
-- No game logic trusted to the client
-- Database models reflect real relationships
-- API is clean, explicit, and testable
+**Design principles:**
+- Backend is the source of truth  
+- No game logic is trusted to the client  
+- Database models reflect real relationships  
+- API is explicit, predictable, and testable  
 
 ---
 
@@ -62,9 +68,39 @@ Core entities include:
 - **Badge**
 - **PlayerBadge**
 
-The database schema for GlobeMaster is illustrated below:
-
 ![GlobeMaster ERD](./globemaster_erd.png)
+
+---
+
+## 🚨 Required Seeding (Important)
+
+⚠️ **GlobeMaster cannot be played without seeding the database first.**  
+This is intentional and documented behavior.
+
+Before running the application locally or after a fresh deployment, you **must** seed the following data:
+
+### 1️⃣ Seed Questions
+This populates the quiz question pool.
+
+```bash
+python backend/seed.py
+```
+
+### 2️⃣ Seed Badges
+This populates the badge definitions used by the achievement system.
+
+```bash
+python backend/seed_badges.py
+```
+
+### Why this is required
+
+- Questions are **not hardcoded**
+- Badges are **not auto-generated**
+- The game logic assumes both datasets already exist
+- Without seeding, gameplay will fail or appear incomplete
+
+This mirrors real production systems where reference data is loaded explicitly rather than inferred at runtime.
 
 ---
 
@@ -72,31 +108,23 @@ The database schema for GlobeMaster is illustrated below:
 
 GlobeMaster is deployed as a **single Heroku application**:
 
-- Flask serves the API and the built React frontend
-- PostgreSQL is provided via Heroku Postgres
-- Configuration is handled through environment variables
+- Flask serves both the API and the frontend build  
+- PostgreSQL is provided via Heroku Postgres  
+- Environment variables handle configuration  
 
-There is **no Docker requirement** for deployment.
+There is **no Docker requirement**.
 
 ---
 
 ## 🧪 Example API Endpoints
 
-- `GET /meta/health` – Health check
-- `GET /meta/categories` – Available quiz categories
-- `POST /players` – Create player
-- `GET /players/email/<email>` – Load player
-- `POST /games` – Start a new game session
-- `POST /game-session-questions` – Submit an answer
-- `GET /badges/player/<id>` – Player achievements
-
----
-
-## 🎥 Demo Video
-
-> **Demo video coming soon**
-
-**[ PLACEHOLDER – New walkthrough video will be added here ]**
+- `GET /meta/health` – Health check  
+- `GET /meta/categories` – Quiz categories  
+- `POST /players` – Create player  
+- `GET /players/email/<email>` – Load player  
+- `POST /games` – Start a new game session  
+- `POST /game-session-questions` – Submit an answer  
+- `GET /badges/player/<id>` – Player achievements  
 
 ---
 
