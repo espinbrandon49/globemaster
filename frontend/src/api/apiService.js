@@ -1,5 +1,5 @@
 // 📡 Get the base URL for your Flask API from the .env file
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = "";
 
 /**
  * 🧰 Universal request handler
