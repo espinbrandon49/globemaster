@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_cors import CORS
 from config import Config
 
 db = SQLAlchemy()
@@ -9,11 +8,8 @@ migrate = Migrate()
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="static", static_url_path="")
     app.config.from_object(Config)
-
-    # ✅ Apply CORS before routes — allow Vite dev server (5173)
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -36,5 +32,15 @@ def create_app():
     app.register_blueprint(badge_bp, url_prefix="/badges")
     app.register_blueprint(leaderboard_bp, url_prefix="/leaderboard")
     app.register_blueprint(meta_bp, url_prefix="/meta")
+
+    from flask import send_from_directory
+    import os
+
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def serve_react(path):
+        if path and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        return send_from_directory(app.static_folder, "index.html")
 
     return app
