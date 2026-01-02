@@ -58,7 +58,7 @@ def create_app():
             "meta",
         )
 
-        if any(path == p or path.startswith(p + "/") for p in api_prefixes):
+        if any(path.startswith(p + "/") for p in api_prefixes):
             return {"error": "Not found"}, 404
 
         return send_from_directory(app.static_folder, "index.html")
